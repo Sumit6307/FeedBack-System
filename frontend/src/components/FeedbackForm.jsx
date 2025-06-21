@@ -11,7 +11,7 @@ const FeedbackForm = ({ employeeId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8000/api/feedback', {
+      await axios.post('http://localhost:8000/feedback', {
         employee_id: employeeId,
         strengths,
         areas_to_improve: areasToImprove,
@@ -25,7 +25,6 @@ const FeedbackForm = ({ employeeId }) => {
       setAreasToImprove('');
       setSentiment('positive');
       setComments('');
-    });
     } catch (err) {
       alert('Error submitting feedback');
     }
@@ -71,8 +70,7 @@ const FeedbackForm = ({ employeeId }) => {
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           Submit
-        >
-      </button>
+        </button>
       </form>
     </div>
   );

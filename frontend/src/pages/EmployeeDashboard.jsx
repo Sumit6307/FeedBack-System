@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import FeedbackList from '../components/FeedbackList';
+import FeedbackList from '../components/FeedbackList.jsx';
 
 const EmployeeDashboard = ({ user }) => {
   const [feedback, setFeedback] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/feedback', {
+    axios.get('http://localhost:8000/feedback', {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     }).then(res => setFeedback(res.data));
   }, []);
 
   const handleAcknowledge = async (feedbackId) => {
     try {
-      await axios.post(`http://localhost:8000/api/feedback/${feedbackId}/acknowledge`, {}, {
+      await axios.post(`http://localhost:8000/feedback/${feedbackId}/acknowledge`, {}, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       alert('Feedback acknowledged successfully!');
