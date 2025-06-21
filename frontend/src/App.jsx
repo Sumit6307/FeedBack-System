@@ -1,35 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import axios from 'axios';
+import Navbar from './components/Navbar';
+import Login from './components/Login';
+import ManagerDashboard from './pages/ManagerDashboard';
+import EmployeeDashboard from './pages/EmployeeDashboard';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (token) {
+      axios.get('http://localhost:8000/api/users/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(res => setUser(res.data)).catch(() => {
+        setError('Failed to fetch user data');
+        localStorage.removeItem('token');
+        setToken(null);
+      });
+    }
+  }, [token]);
+
+  const handleLogin = () => {
+    setToken(null);
+    setUser(null);
+  };
+
+  if (!token || !user) {
+    return <Login setToken={setToken} error={error} />;
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <Router>
+      <div className="min-h-screen bg-gray-100">
+        <Navbar logout={logout} user={user} />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={
+            user.role === 'manager' ? <ManagerDashboard user={user} /> : <EmployeeDashboard user={user} />
+          } />
+        </Routes>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </Router>
+  );
 }
 
-export default App
+export default App;
